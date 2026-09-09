@@ -8,215 +8,91 @@
 
 // GPIOA
 #define GPIOA_CRL       (*(volatile unsigned int *)0x40010800)
-#define GPIOA_CRH       (*(volatile unsigned int *)0x40010804)
-#define GPIOA_IDR       (*(volatile unsigned int *)0x40010808)
 #define GPIOA_BSRR      (*(volatile unsigned int *)0x40010810)
+
+// GPIOB
+#define GPIOB_CRH       (*(volatile unsigned int *)0x40010C04)
+#define GPIOB_IDR       (*(volatile unsigned int *)0x40010C08)
+#define GPIOB_BSRR      (*(volatile unsigned int *)0x40010C10)
 
 // SysTick
 #define SYST_CSR        (*(volatile unsigned int *)0xE000E010)
 #define SYST_RVR        (*(volatile unsigned int *)0xE000E014)
 #define SYST_CVR        (*(volatile unsigned int *)0xE000E018)
 
-
-/* 
- * CLOCK: 8 MHz HSE - 72 MHz SYSCLK
- */
-static void clock_init(void)
-{
-    /*
-     * 72 MHz cần 2 wait states cho FLASH
-     * LATENCY[2:0] = 010
-     */
-    FLASH_ACR &= ~0x7U;
-    FLASH_ACR |=  0x2U;
-
-
-    /*
-     * Bật HSE
-     */
-    RCC_CR |= (1U << 16);
-
-    /*
-     * Chờ HSE ổn định
-     *
-     * RCC_CR bit 17 = HSERDY
-     */
-    while (!(RCC_CR & (1U << 17)))
-    {
-    }
-
-
-    /*
-     * Cấu hình:
-     *
-     * AHB  = SYSCLK / 1 = 72 MHz
-     * APB1 = HCLK / 2   = 36 MHz
-     * APB2 = HCLK / 1   = 72 MHz
-     *
-     * PLL source = HSE
-     * PLL multiplier = x9
-     */
-
-    RCC_CFGR = 0;
-
-    /* APB1 prescaler = /2
-       PPRE1 = 100
-    */
-    RCC_CFGR |= (4U << 8);
-
-    /* PLL source = HSE */
-    RCC_CFGR |= (1U << 16);
-
-    /* PLL multiplier = x9
-       PLLMUL = 0111
-    */
-    RCC_CFGR |= (7U << 18);
-
-
-    /*
-     * Bật PLL
-     */
-    RCC_CR |= (1U << 24);
-
-    /*
-     * Chờ PLL lock
-     */
-    while (!(RCC_CR & (1U << 25)))
-    {
-    }
-
-
-    /*
-     * Chọn PLL làm SYSCLK
-     *
-     * SW = 10
-     */
-    RCC_CFGR &= ~(3U << 0);
-    RCC_CFGR |=  (2U << 0);
-
-
-    /*
-     * Chờ hệ thống chuyển sang PLL
-     *
-     * SWS = 10
-     */
-    while ((RCC_CFGR & (3U << 2)) != (2U << 2))
-    {
-    }
-}
-
-
-/* 
- * SysTick
- */
-static void systick_init(void)
-{
-    /*
-     * CPU = 72 MHz
-     *
-     * 1 ms:
-     *
-     * 72,000,000 / 1000 = 72,000
-     *
-     * Reload = 72000 - 1
-     */
-    SYST_RVR = 72000U - 1U;
-
-    /* Clear current value */
-    SYST_CVR = 0;
-
-    /*
-     * bit 0 ENABLE    = 1
-     * bit 1 TICKINT   = 0   (không dùng interrupt)
-     * bit 2 CLKSOURCE = 1   (CPU clock = 72 MHz)
-     */
-    SYST_CSR = (1U << 2) | (1U << 0);
-}
-
-
-/* 
- * Delay 
- */
-static void delay_ms(unsigned int ms)
-{
-    while (ms--)
-    {
-        /*
-         * COUNTFLAG = bit 16
-         * được set khi SysTick đếm từ 0 về reload
-         */
-        while (!(SYST_CSR & (1U << 16)))
-        {
-        }
-    }
-}
-
 /*
- * GPIO:   
- * PA0 = Input pull-up 
- * PA8 = Output push-pull 2 MHz 
- */ 
-static void gpio_init(void) { 
-    // Enable GPIOA clock 
-    RCC_APB2ENR |= (1U << 2); 
+ * GPIO:
+ *
+ * PA0 = Output push-pull 2 MHz
+ * PB8 = Input pull-up
+ */
+static void gpio_init(void)
+{
+    // Enable GPIOA clock
+    RCC_APB2ENR |= (1U << 2);
+
+    // Enable GPIOB clock
+    RCC_APB2ENR |= (1U << 3);
+
+
     /*
-     * PA0: Input pull-up  
-     * PA0 nằm trong CRL, bits [3:0] 
-     * MODE0 = 00 
-     * CNF0 = 10 
-     * => 0b1000 = 0x8 
-     */ 
-    GPIOA_CRL &= ~(0xFU << 0); 
-    GPIOA_CRL |= (0x8U << 0); 
-    /*
-     * Kéo PA0 lên VCC bằng pull-up nội.
-     * Với input pull-up: * ODR bit 0 = 1 
-     */ 
-    GPIOA_BSRR = (1U << 0); 
-    /*
-     * PA8: Output push-pull 2 MHz
-     * PA8 nằm trong CRH, bits [3:0]
-     * MODE8 = 10 -> output 2 MHz
-     * CNF8 = 00 -> general purpose push-pull
-     * => 0b0010 = 0x2
+     * PA0: Output push-pull 2 MHz
+     *
+     * PA0 nằm trong CRL, bits [3:0]
+     *
+     * MODE0 = 10 -> Output 2 MHz
+     * CNF0  = 00 -> General purpose push-pull
+     *
+     * => 0010 = 0x2
      */
-    GPIOA_CRH &= ~(0xFU << 0);
-    GPIOA_CRH |= (0x2U << 0);
+    GPIOA_CRL &= ~(0xFU << 0);
+    GPIOA_CRL |=  (0x2U << 0);
+
+
     /*
-     * Ban đầu LED OFF
+     * PA0 = 0 ban đầu
      */
-    GPIOA_BSRR = (1U << (8 + 16));
+    GPIOA_BSRR = (1U << (0 + 16));
+
+
+    /*
+     * PB8: Input pull-up
+     *
+     * PB8 nằm trong CRH, bits [3:0]
+     *
+     * MODE8 = 00
+     * CNF8  = 10
+     *
+     * => 1000 = 0x8
+     */
+    GPIOB_CRH &= ~(0xFU << 0);
+    GPIOB_CRH |=  (0x8U << 0);
+
+
+    /*
+     * Pull-up nội:
+     *
+     * PB8 ODR = 1
+     */
+    GPIOB_BSRR = (1U << 8);
+}
+/*
+ * PB8 = 0 -> nút nhấn
+ * PB8 = 1 -> nút thả
+ */
+static unsigned char button_pressed(void)
+{
+    return (GPIOB_IDR & (1U << 8)) == 0;
+}
+static void led_on(void)
+{
+    GPIOA_BSRR = (1U << 0);
 }
 
-/*
- * Đọc trạng thái PA0 
- * PA0 = 0 -> nút đang nhấn 
- * PA0 = 1 -> nút đang thả 
- */ 
-static unsigned char button_pressed(void) 
-{ 
-    return (GPIOA_IDR & (1U << 0)) == 0; 
-} 
-/*
- * Đảo trạng thái LED PA8 
- */ 
-static void led_toggle(void) 
-{ 
-    static unsigned char led_state = 0; 
-    led_state = !led_state; 
-    if (led_state) 
-    { 
-        // PA8 = 1 
-        GPIOA_BSRR = (1U << 8); 
-    } 
-    else 
-    { 
-        // PA8 = 0 
-        GPIOA_BSRR = (1U << (8 + 16)); 
-    } 
+static void led_off(void)
+{
+    GPIOA_BSRR = (1U << (0 + 16));
 }
-
-
 int main(void)
 {
     clock_init();
@@ -225,29 +101,29 @@ int main(void)
 
     while (1)
     {
-        /* 
-         * Chờ nút được nhấn 
-         */ 
-        if (button_pressed()) 
-        { 
-            /*
-             * Debounce: 
-             * Chờ 20 ms để loại bỏ rung phím 
-             */ 
-            delay_ms(20); 
-             
-            if (button_pressed()) 
+        if (button_pressed())
+        {
+            // Debounce
+            delay_ms(20);
+
+            if (button_pressed())
             {
-                while (button_pressed()) {} 
-                /*
-                 * Debounce lúc nhả 
-                 */ 
-                delay_ms(20); 
-                if (!button_pressed()) 
-                { 
-                    led_toggle(); 
-                } 
-            } 
+                led_on();
+
+                // Giữ nút → LED tiếp tục sáng
+                while (button_pressed())
+                {
+                }
+
+                // Debounce lúc nhả
+                delay_ms(20);
+
+                led_off();
+            }
+        }
+        else
+        {
+            led_off();
         }
     }
 }
