@@ -1,0 +1,266 @@
+
+Discarded input sections
+
+ .group         0x00000000        0xc Build/main.o
+ .group         0x00000000        0xc Build/main.o
+ .text          0x00000000        0x0 Build/main.o
+ .data          0x00000000        0x0 Build/main.o
+ .bss           0x00000000        0x0 Build/main.o
+ .group         0x00000000        0xc Build/startup.o
+ .text          0x00000000        0x0 Build/startup.o
+ .data          0x00000000        0x0 Build/startup.o
+ .bss           0x00000000        0x0 Build/startup.o
+ .debug_macro   0x00000000      0xaba Build/startup.o
+ .group         0x00000000        0xc Build/clock.o
+ .group         0x00000000        0xc Build/clock.o
+ .group         0x00000000        0xc Build/clock.o
+ .text          0x00000000        0x0 Build/clock.o
+ .data          0x00000000        0x0 Build/clock.o
+ .bss           0x00000000        0x0 Build/clock.o
+ .debug_macro   0x00000000      0xaba Build/clock.o
+ .debug_macro   0x00000000      0x34e Build/clock.o
+ .group         0x00000000        0xc Build/delay.o
+ .group         0x00000000        0xc Build/delay.o
+ .group         0x00000000        0xc Build/delay.o
+ .text          0x00000000        0x0 Build/delay.o
+ .data          0x00000000        0x0 Build/delay.o
+ .bss           0x00000000        0x0 Build/delay.o
+ .debug_macro   0x00000000      0xaba Build/delay.o
+ .debug_macro   0x00000000      0x34e Build/delay.o
+ .group         0x00000000        0xc Build/uart.o
+ .group         0x00000000        0xc Build/uart.o
+ .group         0x00000000        0xc Build/uart.o
+ .text          0x00000000        0x0 Build/uart.o
+ .data          0x00000000        0x0 Build/uart.o
+ .bss           0x00000000        0x0 Build/uart.o
+ .debug_macro   0x00000000      0xaba Build/uart.o
+ .debug_macro   0x00000000      0x34e Build/uart.o
+ .debug_macro   0x00000000       0x52 Build/uart.o
+ .group         0x00000000        0xc Build/adc.o
+ .group         0x00000000        0xc Build/adc.o
+ .group         0x00000000        0xc Build/adc.o
+ .text          0x00000000        0x0 Build/adc.o
+ .data          0x00000000        0x0 Build/adc.o
+ .bss           0x00000000        0x0 Build/adc.o
+ .debug_macro   0x00000000      0xaba Build/adc.o
+ .debug_macro   0x00000000      0x34e Build/adc.o
+ .debug_macro   0x00000000       0x52 Build/adc.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00010000         xr
+RAM              0x20000000         0x00005000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD Build/main.o
+LOAD Build/startup.o
+LOAD Build/clock.o
+LOAD Build/delay.o
+LOAD Build/uart.o
+LOAD Build/adc.o
+                0x20005000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+
+.isr_vector     0x08000000       0x40
+                0x08000000                        . = ALIGN (0x4)
+ *(.isr_vector)
+ .isr_vector    0x08000000       0x40 Build/startup.o
+                0x08000000                vector_table
+                0x08000040                        . = ALIGN (0x4)
+
+.text           0x08000040      0x520
+                0x08000040                        . = ALIGN (0x4)
+ *(.text)
+ *(.text*)
+ .text.main     0x08000040       0xc8 Build/main.o
+                0x08000040                main
+ .text.Reset_Handler
+                0x08000108       0x5c Build/startup.o
+                0x08000108                Reset_Handler
+ .text.Default_Handler
+                0x08000164        0x8 Build/startup.o
+                0x08000164                Default_Handler
+ .text.SysTick_Handler
+                0x0800016c        0xc Build/startup.o
+                0x0800016c                SysTick_Handler
+ .text.Clock_Init
+                0x08000178       0xe0 Build/clock.o
+                0x08000178                Clock_Init
+ .text.SysTick_Init
+                0x08000258       0x28 Build/delay.o
+                0x08000258                SysTick_Init
+ .text.Delay_ms
+                0x08000280       0x34 Build/delay.o
+                0x08000280                Delay_ms
+ .text.USART1_Init
+                0x080002b4       0x70 Build/uart.o
+                0x080002b4                USART1_Init
+ .text.UART_SendChar
+                0x08000324       0x2c Build/uart.o
+                0x08000324                UART_SendChar
+ .text.UART_SendString
+                0x08000350       0x2c Build/uart.o
+                0x08000350                UART_SendString
+ .text.UART_SendNumber
+                0x0800037c       0x80 Build/uart.o
+                0x0800037c                UART_SendNumber
+ .text.ADC1_Init
+                0x080003fc      0x104 Build/adc.o
+                0x080003fc                ADC1_Init
+ .text.ADC1_Read
+                0x08000500       0x30 Build/adc.o
+                0x08000500                ADC1_Read
+ *(.rodata)
+ .rodata        0x08000530       0x2d Build/main.o
+ *(.rodata*)
+                0x08000560                        . = ALIGN (0x4)
+ *fill*         0x0800055d        0x3 
+
+.glue_7         0x08000560        0x0
+ .glue_7        0x08000560        0x0 linker stubs
+
+.glue_7t        0x08000560        0x0
+ .glue_7t       0x08000560        0x0 linker stubs
+
+.vfp11_veneer   0x08000560        0x0
+ .vfp11_veneer  0x08000560        0x0 linker stubs
+
+.v4_bx          0x08000560        0x0
+ .v4_bx         0x08000560        0x0 linker stubs
+
+.iplt           0x08000560        0x0
+ .iplt          0x08000560        0x0 Build/main.o
+
+.rel.dyn        0x08000560        0x0
+ .rel.iplt      0x08000560        0x0 Build/main.o
+
+.data           0x20000000        0x0 load address 0x08000560
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data)
+ *(.data*)
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _edata = .
+                0x08000560                        _sidata = LOADADDR (.data)
+
+.igot.plt       0x20000000        0x0 load address 0x08000560
+ .igot.plt      0x20000000        0x0 Build/main.o
+
+.bss            0x20000000        0x0 load address 0x08000560
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sbss = .
+ *(.bss)
+ *(.bss*)
+ *(COMMON)
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _ebss = .
+OUTPUT(Bin/firmware.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x97f
+ .debug_info    0x00000000      0x14b Build/main.o
+ .debug_info    0x0000014b      0x11f Build/startup.o
+ .debug_info    0x0000026a      0x11e Build/clock.o
+ .debug_info    0x00000388       0xfd Build/delay.o
+ .debug_info    0x00000485      0x272 Build/uart.o
+ .debug_info    0x000006f7      0x288 Build/adc.o
+
+.debug_abbrev   0x00000000      0x4e9
+ .debug_abbrev  0x00000000       0xca Build/main.o
+ .debug_abbrev  0x000000ca       0xec Build/startup.o
+ .debug_abbrev  0x000001b6       0x92 Build/clock.o
+ .debug_abbrev  0x00000248       0xba Build/delay.o
+ .debug_abbrev  0x00000302      0x120 Build/uart.o
+ .debug_abbrev  0x00000422       0xc7 Build/adc.o
+
+.debug_aranges  0x00000000       0xf8
+ .debug_aranges
+                0x00000000       0x20 Build/main.o
+ .debug_aranges
+                0x00000020       0x30 Build/startup.o
+ .debug_aranges
+                0x00000050       0x20 Build/clock.o
+ .debug_aranges
+                0x00000070       0x28 Build/delay.o
+ .debug_aranges
+                0x00000098       0x38 Build/uart.o
+ .debug_aranges
+                0x000000d0       0x28 Build/adc.o
+
+.debug_rnglists
+                0x00000000       0xa0
+ .debug_rnglists
+                0x00000000       0x14 Build/main.o
+ .debug_rnglists
+                0x00000014       0x1f Build/startup.o
+ .debug_rnglists
+                0x00000033       0x14 Build/clock.o
+ .debug_rnglists
+                0x00000047       0x19 Build/delay.o
+ .debug_rnglists
+                0x00000060       0x26 Build/uart.o
+ .debug_rnglists
+                0x00000086       0x1a Build/adc.o
+
+.debug_macro    0x00000000      0xfb3
+ .debug_macro   0x00000000       0x42 Build/main.o
+ .debug_macro   0x00000042      0xaba Build/main.o
+ .debug_macro   0x00000afc      0x34e Build/main.o
+ .debug_macro   0x00000e4a       0x11 Build/startup.o
+ .debug_macro   0x00000e5b       0x33 Build/clock.o
+ .debug_macro   0x00000e8e       0x4c Build/clock.o
+ .debug_macro   0x00000eda       0x2d Build/delay.o
+ .debug_macro   0x00000f07       0x52 Build/delay.o
+ .debug_macro   0x00000f59       0x2d Build/uart.o
+ .debug_macro   0x00000f86       0x2d Build/adc.o
+
+.debug_line     0x00000000      0x638
+ .debug_line    0x00000000       0xda Build/main.o
+ .debug_line    0x000000da       0x8e Build/startup.o
+ .debug_line    0x00000168      0x141 Build/clock.o
+ .debug_line    0x000002a9       0xd9 Build/delay.o
+ .debug_line    0x00000382      0x14f Build/uart.o
+ .debug_line    0x000004d1      0x167 Build/adc.o
+
+.debug_str      0x00000000     0x3ae4
+ .debug_str     0x00000000     0x3ae4 Build/main.o
+                               0x3941 (size before relaxing)
+ .debug_str     0x00003ae4     0x2e66 Build/startup.o
+ .debug_str     0x00003ae4     0x3a4d Build/clock.o
+ .debug_str     0x00003ae4     0x3a2d Build/delay.o
+ .debug_str     0x00003ae4     0x3aab Build/uart.o
+ .debug_str     0x00003ae4     0x3abc Build/adc.o
+
+.comment        0x00000000       0x26
+ .comment       0x00000000       0x26 Build/main.o
+                                 0x27 (size before relaxing)
+ .comment       0x00000026       0x27 Build/startup.o
+ .comment       0x00000026       0x27 Build/clock.o
+ .comment       0x00000026       0x27 Build/delay.o
+ .comment       0x00000026       0x27 Build/uart.o
+ .comment       0x00000026       0x27 Build/adc.o
+
+.ARM.attributes
+                0x00000000       0x2d
+ .ARM.attributes
+                0x00000000       0x2d Build/main.o
+ .ARM.attributes
+                0x0000002d       0x2d Build/startup.o
+ .ARM.attributes
+                0x0000005a       0x2d Build/clock.o
+ .ARM.attributes
+                0x00000087       0x2d Build/delay.o
+ .ARM.attributes
+                0x000000b4       0x2d Build/uart.o
+ .ARM.attributes
+                0x000000e1       0x2d Build/adc.o
+
+.debug_frame    0x00000000      0x218
+ .debug_frame   0x00000000       0x30 Build/main.o
+ .debug_frame   0x00000030       0x68 Build/startup.o
+ .debug_frame   0x00000098       0x30 Build/clock.o
+ .debug_frame   0x000000c8       0x58 Build/delay.o
+ .debug_frame   0x00000120       0xa0 Build/uart.o
+ .debug_frame   0x000001c0       0x58 Build/adc.o

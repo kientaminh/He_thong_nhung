@@ -1,0 +1,225 @@
+
+Discarded input sections
+
+ .group         0x00000000        0xc Build/main.o
+ .group         0x00000000        0xc Build/main.o
+ .group         0x00000000        0xc Build/main.o
+ .text          0x00000000        0x0 Build/main.o
+ .data          0x00000000        0x0 Build/main.o
+ .bss           0x00000000        0x0 Build/main.o
+ .group         0x00000000        0xc Build/startup.o
+ .text          0x00000000        0x0 Build/startup.o
+ .data          0x00000000        0x0 Build/startup.o
+ .bss           0x00000000        0x0 Build/startup.o
+ .debug_macro   0x00000000      0xaba Build/startup.o
+ .group         0x00000000        0xc Build/clock.o
+ .group         0x00000000        0xc Build/clock.o
+ .group         0x00000000        0xc Build/clock.o
+ .text          0x00000000        0x0 Build/clock.o
+ .data          0x00000000        0x0 Build/clock.o
+ .bss           0x00000000        0x0 Build/clock.o
+ .debug_macro   0x00000000      0xaba Build/clock.o
+ .debug_macro   0x00000000      0x34e Build/clock.o
+ .debug_macro   0x00000000       0x5e Build/clock.o
+ .group         0x00000000        0xc Build/gpio.o
+ .group         0x00000000        0xc Build/gpio.o
+ .group         0x00000000        0xc Build/gpio.o
+ .text          0x00000000        0x0 Build/gpio.o
+ .data          0x00000000        0x0 Build/gpio.o
+ .bss           0x00000000        0x0 Build/gpio.o
+ .debug_macro   0x00000000      0xaba Build/gpio.o
+ .debug_macro   0x00000000      0x34e Build/gpio.o
+ .debug_macro   0x00000000       0x5e Build/gpio.o
+ .group         0x00000000        0xc Build/timer.o
+ .group         0x00000000        0xc Build/timer.o
+ .group         0x00000000        0xc Build/timer.o
+ .text          0x00000000        0x0 Build/timer.o
+ .data          0x00000000        0x0 Build/timer.o
+ .bss           0x00000000        0x0 Build/timer.o
+ .debug_macro   0x00000000      0xaba Build/timer.o
+ .debug_macro   0x00000000      0x34e Build/timer.o
+ .debug_macro   0x00000000       0x5e Build/timer.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00010000         xr
+RAM              0x20000000         0x00005000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD Build/main.o
+LOAD Build/startup.o
+LOAD Build/clock.o
+LOAD Build/gpio.o
+LOAD Build/timer.o
+                0x20005000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+
+.isr_vector     0x08000000       0x40
+                0x08000000                        . = ALIGN (0x4)
+ *(.isr_vector)
+ .isr_vector    0x08000000       0x40 Build/startup.o
+                0x08000000                vector_table
+                0x08000040                        . = ALIGN (0x4)
+
+.text           0x08000040      0x368
+                0x08000040                        . = ALIGN (0x4)
+ *(.text)
+ *(.text*)
+ .text.main     0x08000040       0x14 Build/main.o
+                0x08000040                main
+ .text.Reset_Handler
+                0x08000054       0x5c Build/startup.o
+                0x08000054                Reset_Handler
+ .text.Default_Handler
+                0x080000b0        0x8 Build/startup.o
+                0x080000b0                Default_Handler
+ .text.SysTick_Handler
+                0x080000b8        0xc Build/startup.o
+                0x080000b8                SysTick_Handler
+ .text.Clock_Init
+                0x080000c4       0xe0 Build/clock.o
+                0x080000c4                Clock_Init
+ .text.GPIO_Init
+                0x080001a4       0x80 Build/gpio.o
+                0x080001a4                GPIO_Init
+ .text.TIM2_Init
+                0x08000224      0x184 Build/timer.o
+                0x08000224                TIM2_Init
+ *(.rodata)
+ *(.rodata*)
+                0x080003a8                        . = ALIGN (0x4)
+
+.glue_7         0x080003a8        0x0
+ .glue_7        0x080003a8        0x0 linker stubs
+
+.glue_7t        0x080003a8        0x0
+ .glue_7t       0x080003a8        0x0 linker stubs
+
+.vfp11_veneer   0x080003a8        0x0
+ .vfp11_veneer  0x080003a8        0x0 linker stubs
+
+.v4_bx          0x080003a8        0x0
+ .v4_bx         0x080003a8        0x0 linker stubs
+
+.iplt           0x080003a8        0x0
+ .iplt          0x080003a8        0x0 Build/main.o
+
+.rel.dyn        0x080003a8        0x0
+ .rel.iplt      0x080003a8        0x0 Build/main.o
+
+.data           0x20000000        0x0 load address 0x080003a8
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data)
+ *(.data*)
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _edata = .
+                0x080003a8                        _sidata = LOADADDR (.data)
+
+.igot.plt       0x20000000        0x0 load address 0x080003a8
+ .igot.plt      0x20000000        0x0 Build/main.o
+
+.bss            0x20000000        0x0 load address 0x080003a8
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sbss = .
+ *(.bss)
+ *(.bss*)
+ *(COMMON)
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _ebss = .
+OUTPUT(Bin/firmware.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x606
+ .debug_info    0x00000000       0x9c Build/main.o
+ .debug_info    0x0000009c      0x11f Build/startup.o
+ .debug_info    0x000001bb      0x11e Build/clock.o
+ .debug_info    0x000002d9      0x160 Build/gpio.o
+ .debug_info    0x00000439      0x1cd Build/timer.o
+
+.debug_abbrev   0x00000000      0x2fd
+ .debug_abbrev  0x00000000       0x5b Build/main.o
+ .debug_abbrev  0x0000005b       0xec Build/startup.o
+ .debug_abbrev  0x00000147       0x92 Build/clock.o
+ .debug_abbrev  0x000001d9       0x92 Build/gpio.o
+ .debug_abbrev  0x0000026b       0x92 Build/timer.o
+
+.debug_aranges  0x00000000       0xb0
+ .debug_aranges
+                0x00000000       0x20 Build/main.o
+ .debug_aranges
+                0x00000020       0x30 Build/startup.o
+ .debug_aranges
+                0x00000050       0x20 Build/clock.o
+ .debug_aranges
+                0x00000070       0x20 Build/gpio.o
+ .debug_aranges
+                0x00000090       0x20 Build/timer.o
+
+.debug_rnglists
+                0x00000000       0x6e
+ .debug_rnglists
+                0x00000000       0x13 Build/main.o
+ .debug_rnglists
+                0x00000013       0x1f Build/startup.o
+ .debug_rnglists
+                0x00000032       0x14 Build/clock.o
+ .debug_rnglists
+                0x00000046       0x14 Build/gpio.o
+ .debug_rnglists
+                0x0000005a       0x14 Build/timer.o
+
+.debug_macro    0x00000000      0xf5b
+ .debug_macro   0x00000000       0x47 Build/main.o
+ .debug_macro   0x00000047      0xaba Build/main.o
+ .debug_macro   0x00000b01      0x34e Build/main.o
+ .debug_macro   0x00000e4f       0x5e Build/main.o
+ .debug_macro   0x00000ead       0x11 Build/startup.o
+ .debug_macro   0x00000ebe       0x33 Build/clock.o
+ .debug_macro   0x00000ef1       0x33 Build/gpio.o
+ .debug_macro   0x00000f24       0x37 Build/timer.o
+
+.debug_line     0x00000000      0x470
+ .debug_line    0x00000000       0xab Build/main.o
+ .debug_line    0x000000ab       0x8e Build/startup.o
+ .debug_line    0x00000139      0x141 Build/clock.o
+ .debug_line    0x0000027a       0xc8 Build/gpio.o
+ .debug_line    0x00000342      0x12e Build/timer.o
+
+.debug_str      0x00000000     0x3a5a
+ .debug_str     0x00000000     0x3a5a Build/main.o
+                               0x3a6c (size before relaxing)
+ .debug_str     0x00003a5a     0x2e66 Build/startup.o
+ .debug_str     0x00003a5a     0x3a94 Build/clock.o
+ .debug_str     0x00003a5a     0x3a9a Build/gpio.o
+ .debug_str     0x00003a5a     0x3aca Build/timer.o
+
+.comment        0x00000000       0x26
+ .comment       0x00000000       0x26 Build/main.o
+                                 0x27 (size before relaxing)
+ .comment       0x00000026       0x27 Build/startup.o
+ .comment       0x00000026       0x27 Build/clock.o
+ .comment       0x00000026       0x27 Build/gpio.o
+ .comment       0x00000026       0x27 Build/timer.o
+
+.ARM.attributes
+                0x00000000       0x2d
+ .ARM.attributes
+                0x00000000       0x2d Build/main.o
+ .ARM.attributes
+                0x0000002d       0x2d Build/startup.o
+ .ARM.attributes
+                0x0000005a       0x2d Build/clock.o
+ .ARM.attributes
+                0x00000087       0x2d Build/gpio.o
+ .ARM.attributes
+                0x000000b4       0x2d Build/timer.o
+
+.debug_frame    0x00000000      0x124
+ .debug_frame   0x00000000       0x2c Build/main.o
+ .debug_frame   0x0000002c       0x68 Build/startup.o
+ .debug_frame   0x00000094       0x30 Build/clock.o
+ .debug_frame   0x000000c4       0x30 Build/gpio.o
+ .debug_frame   0x000000f4       0x30 Build/timer.o
